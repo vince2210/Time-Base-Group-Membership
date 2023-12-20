@@ -361,6 +361,3 @@ $global:ForestMode = ""
 $global:DomainMode = ""
 $global:PAMF = ""
 $Global:domain = ""
-
-$Global:regexttl = '((^<TTL=)([0-9]*)(>))'
-
