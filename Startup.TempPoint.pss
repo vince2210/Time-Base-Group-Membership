@@ -1,0 +1,172 @@
+﻿<File version="3.2">
+  <Code><![CDATA[#Define a Param block to use custom parameters in the project
+#Param ($CustomParameter)
+
+function Main {
+<#
+    .SYNOPSIS
+        The Main function starts the project application.
+    
+    .PARAMETER Commandline
+        $Commandline contains the complete argument string passed to the script packager executable.
+    
+    .NOTES
+        Use this function to initialize your script and to call GUI forms.
+		
+    .NOTES
+        To get the console output in the Packager (Forms Engine) use: 
+		$ConsoleOutput (Type: System.Collections.ArrayList)
+#>
+	Param ([String]$Commandline)
+		
+	#--------------------------------------------------------------------------
+	#TODO: Add initialization script here (Load modules and check requirements)
+	
+	
+	#--------------------------------------------------------------------------
+	
+	
+		#TODO: Place initialization script here:
+		
+	
+	if((Show-MainForm_psf) -eq 'OK')
+	{
+		
+	}
+	
+	$script:ExitCode = 0 #Set the exit code for the Packager
+}
+
+
+
+#region Splash Screen Helper Function
+function Show-SplashScreen
+{
+	<#
+	.SYNOPSIS
+		Displays a splash screen using the specified image.
+	
+	.PARAMETER Image
+		Mandatory Image object that is displayed in the splash screen.
+	
+	.PARAMETER Title
+		(Optional) Sets a title for the splash screen window. 
+	
+	.PARAMETER Timeout
+		The amount of seconds before the splash screen is closed.
+		Set to 0 to leave the splash screen open indefinitely.
+		Default: 2
+	
+	.PARAMETER ImageLocation
+		The file path or url to the image.
+
+	.PARAMETER PassThru
+		Returns the splash screen form control. Use to manually close the form.
+	
+	.PARAMETER Modal
+		The splash screen will hold up the pipeline until it closes.
+
+	.EXAMPLE
+		PS C:\> Show-SplashScreen -Image $Image -Title 'Loading...' -Timeout 3
+
+	.EXAMPLE
+		PS C:\> Show-SplashScreen -ImageLocation 'C:\Image\MyImage.png' -Title 'Loading...' -Timeout 3
+
+	.EXAMPLE
+		PS C:\> $splashScreen = Show-SplashScreen -Image $Image -Title 'Loading...' -PassThru
+				#close the splash screen
+				$splashScreen.Close()
+	.OUTPUTS
+		System.Windows.Forms.Form
+	
+	.NOTES
+		Created by SAPIEN Technologies, Inc.
+
+		The size of the splash screen is dependent on the image.
+		The required assemblies to use this function outside of a WinForms script:
+		Add-Type -AssemblyName System.Windows.Forms
+		Add-Type -AssemblyName System.Drawing
+#>
+	[OutputType([System.Windows.Forms.Form])]
+	param
+	(
+		[Parameter(ParameterSetName = 'Image',
+				   Mandatory = $true,
+				   Position = 1)]
+		[ValidateNotNull()]
+		[System.Drawing.Image]$Image,
+		[Parameter(Mandatory = $false)]
+		[string]$Title,
+		[int]$Timeout = 2,
+		[Parameter(ParameterSetName = 'ImageLocation',
+				   Mandatory = $true,
+				   Position = 1)]
+		[ValidateNotNullOrEmpty()]
+		[string]$ImageLocation,
+		[switch]$PassThru,
+		[switch]$Modal
+	)
+	
+	#Create a splash screen form to display the image.
+	$splashForm = New-Object System.Windows.Forms.Form
+	
+	#Create a picture box for the image
+	$pict = New-Object System.Windows.Forms.PictureBox
+	
+	if ($Image)
+	{
+		$pict.Image = $Image;
+	}
+	else
+	{
+		$pict.Load($ImageLocation)
+	}
+	
+	$pict.AutoSize = $true
+	$pict.Dock = 'Fill'
+	$splashForm.Controls.Add($pict)
+	
+	#Display a title if defined.
+	if ($Title)
+	{
+		$splashForm.Text = $Title
+		$splashForm.FormBorderStyle = 'FixedDialog'
+	}
+	else
+	{
+		$splashForm.FormBorderStyle = 'None'
+	}
+	
+	#Set a timer
+	if ($Timeout -gt 0)
+	{
+		$timer = New-Object System.Windows.Forms.Timer
+		$timer.Interval = $Timeout * 1000
+		$timer.Tag = $splashForm
+		$timer.add_Tick({
+				$this.Tag.Close();
+				$this.Stop()
+			})
+		$timer.Start()
+	}
+	
+	#Show the form
+	$splashForm.AutoSize = $true
+	$splashForm.AutoSizeMode = 'GrowAndShrink'
+	$splashForm.ControlBox = $false
+	$splashForm.StartPosition = 'CenterScreen'
+	$splashForm.TopMost = $true
+	
+	if ($Modal) { $splashForm.ShowDialog() }
+	else { $splashForm.Show() }
+	
+	if ($PassThru)
+	{
+		return $splashForm
+	}
+}
+#endregion]]></Code>
+  <Bookmarks />
+  <BreakPoints />
+  <TracePoints />
+</File>
